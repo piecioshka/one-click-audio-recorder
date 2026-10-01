@@ -1,0 +1,65 @@
+{
+  "private": true,
+  "name": "one-click-audio-recorder",
+  "description": "Capture every thought in one click.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "Piotr Kowalski",
+    "email": "piecioshka@gmail.com",
+    "url": "https://piecioshka.pl/"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "icons:generate": "node scripts/generate-icons.mjs",
+    "build": "npm run icons:generate && electron-builder",
+    "build:mac": "npm run icons:generate && electron-builder --mac",
+    "build:linux": "npm run icons:generate && electron-builder --linux",
+    "build:win": "npm run icons:generate && electron-builder --win",
+    "build:all": "npm run icons:generate && electron-builder --mac --linux --win",
+    "start": "electron .",
+    "dev": "nodemon",
+    "test": "node --test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "marketing:render": "electron scripts/marketing/render.js",
+    "lint": "eslint .",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "nodemon": "^3.1.14",
+    "png-to-ico": "^3.0.2",
+    "prettier": "^3.9.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:piecioshka/one-click-audio-recorder.git"
+  },
+  "allowScripts": {
+    "ffmpeg-static": true,
+    "electron-winstaller": false,
+    "fsevents": false
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,json5,md,yml,yaml,html,css}": [
+      "prettier --write"
+    ]
+  }
+}

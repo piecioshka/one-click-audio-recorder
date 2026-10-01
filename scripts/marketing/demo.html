@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OneClick Audio Recorder demo</title>
+    <link rel="stylesheet" href="./marketing.css" />
+    <style>
+      /* The scene is drawn at 1600x900 and scaled down when encoded. */
+      body {
+        width: 1600px;
+        height: 900px;
+      }
+
+      .wallpaper {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 110%, rgba(225, 32, 32, 0.28), transparent 45%),
+          radial-gradient(circle at 85% 0%, rgba(90, 120, 200, 0.35), transparent 50%),
+          linear-gradient(160deg, #1b2740, var(--navy-deep));
+      }
+
+      .menu-bar {
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        padding: 0 28px;
+        font-size: 26px;
+        background: rgba(10, 14, 24, 0.55);
+      }
+
+      .menu-bar-app {
+        font-weight: 700;
+      }
+
+      .menu-bar-status {
+        position: absolute;
+        right: 28px;
+        top: 0;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        gap: 34px;
+      }
+
+      .status-item {
+        height: 40px;
+        min-width: 52px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .status-item.is-active {
+        background: rgba(255, 255, 255, 0.22);
+      }
+
+      .tray-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--dot-idle);
+      }
+
+      .is-recording .tray-dot {
+        background: var(--red);
+      }
+
+      .status-glyph {
+        width: 36px;
+        height: 28px;
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+
+      .clock {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .menu,
+      .submenu {
+        position: absolute;
+        visibility: hidden;
+        padding: 10px;
+        border-radius: 14px;
+        background: var(--menu-bg);
+        color: var(--menu-ink);
+        font-size: 26px;
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.45),
+          0 0 0 1px rgba(0, 0, 0, 0.12);
+      }
+
+      .menu {
+        top: 52px;
+        width: 560px;
+      }
+
+      .submenu {
+        width: 400px;
+      }
+
+      .is-open {
+        visibility: visible;
+      }
+
+      .menu-item {
+        position: relative;
+        height: 44px;
+        padding: 0 16px 0 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 8px;
+        white-space: nowrap;
+      }
+
+      .menu-item.is-disabled {
+        color: var(--menu-muted);
+      }
+
+      .menu-item.is-hovered {
+        background: var(--menu-hover);
+        color: #fff;
+      }
+
+      .menu-item.is-checked::before {
+        content: "✓";
+        position: absolute;
+        left: 14px;
+      }
+
+      .menu-arrow {
+        font-size: 22px;
+      }
+
+      .menu-separator {
+        height: 1px;
+        margin: 8px 16px;
+        background: rgba(0, 0, 0, 0.14);
+      }
+
+      .caption {
+        position: absolute;
+        left: 50%;
+        bottom: 70px;
+        transform: translateX(-50%);
+        padding: 26px 44px;
+        border-radius: 22px;
+        background: rgba(8, 12, 20, 0.72);
+        text-align: center;
+        opacity: 0;
+        white-space: nowrap;
+      }
+
+      .caption.is-visible {
+        opacity: 1;
+      }
+
+      .caption-title {
+        font-size: 48px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .caption-detail {
+        margin-top: 12px;
+        font-family: var(--mono);
+        font-size: 28px;
+        color: var(--muted);
+      }
+
+      .rec-bars {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 44px;
+      }
+
+      .rec-bar {
+        width: 8px;
+        border-radius: 4px;
+        background: var(--red);
+      }
+
+      .cursor {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 34px;
+        height: 50px;
+        transform: translate(var(--x), var(--y)) scale(var(--press, 1));
+        transform-origin: 0 0;
+        opacity: calc(1 - var(--end, 0));
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+      }
+
+      .end-card {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        background: linear-gradient(160deg, #1b2740, var(--navy-deep));
+        opacity: var(--end, 0);
+      }
+
+      .end-icon {
+        width: 260px;
+        height: 260px;
+        filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
+      }
+
+      .end-title {
+        font-size: 76px;
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+
+      .end-tagline {
+        font-size: 40px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wallpaper"></div>
+
+    <div class="menu-bar">
+      <span class="menu-bar-app">Finder</span>
+      <span>File</span>
+      <span>Edit</span>
+      <span>View</span>
+      <span>Go</span>
+      <span>Window</span>
+      <span>Help</span>
+
+      <div class="menu-bar-status">
+        <div class="status-item" id="tray-item"><div class="tray-dot"></div></div>
+        <div class="status-item">
+          <svg class="status-glyph" viewBox="0 0 36 28">
+            <path d="M4 11a20 20 0 0 1 28 0M9 16a13 13 0 0 1 18 0M14 21a6 6 0 0 1 8 0" />
+          </svg>
+        </div>
+        <div class="status-item">
+          <svg class="status-glyph" viewBox="0 0 36 28">
+            <rect x="2" y="6" width="28" height="16" rx="4" />
+            <path d="M34 11v6" />
+          </svg>
+        </div>
+        <span class="clock">2026-09-29 18:42</span>
+      </div>
+    </div>
+
+    <!-- Labels mirror buildTrayMenu() in src/features/tray-menu.js. -->
+    <div class="menu" id="menu">
+      <div class="menu-item">🔴 Start recording</div>
+      <div class="menu-separator"></div>
+      <div class="menu-item">Microphone <span class="menu-arrow">›</span></div>
+      <div class="menu-separator"></div>
+      <div class="menu-item" id="format-item">Output format <span class="menu-arrow">›</span></div>
+      <div class="menu-separator"></div>
+      <div class="menu-item">Set output folder...</div>
+      <div class="menu-item">Open recordings folder</div>
+      <div class="menu-item is-disabled">Current folder: /Users/you/Downloads</div>
+      <div class="menu-separator"></div>
+      <div class="menu-item">About OneClick Audio Recorder</div>
+      <div class="menu-item">Quit</div>
+    </div>
+
+    <div class="submenu" id="submenu">
+      <div class="menu-item is-disabled">Current: WAV</div>
+      <div class="menu-separator"></div>
+      <div class="menu-item is-checked" id="wav-item">WAV (uncompressed)</div>
+      <div class="menu-item">MP3 (compressed, smaller size)</div>
+    </div>
+
+    <div class="caption" id="caption-idle">
+      <div class="caption-title">One dot in your menu bar.</div>
+    </div>
+    <div class="caption" id="caption-recording">
+      <div class="caption-title">
+        <div class="rec-bars" id="rec-bars"></div>
+        Click. You're recording.
+      </div>
+    </div>
+    <div class="caption" id="caption-saved">
+      <div class="caption-title">Click again. Saved.</div>
+      <div class="caption-detail">~/Downloads/audio-recording-2026-09-29T16-42-07-512Z.wav</div>
+    </div>
+    <div class="caption" id="caption-menu">
+      <div class="caption-title">Right click: microphone, format, folder.</div>
+    </div>
+
+    <div class="end-card" id="end-card">
+      <img class="end-icon" src="../../icons/app-icon.png" alt="" />
+      <div class="end-title">OneClick Audio Recorder</div>
+      <div class="end-tagline">Capture every thought in one click.</div>
+    </div>
+
+    <svg class="cursor" id="cursor" viewBox="0 0 34 50">
+      <path
+        d="M3 3 L3 40 L12 31 L18 46 L25 43 L19 28 L31 28 Z"
+        fill="#000"
+        stroke="#fff"
+        stroke-width="3"
+        stroke-linejoin="round"
+      />
+    </svg>
+
+    <script>
+      // renderFrame(t) draws the scene at t seconds. It is a pure function of
+      // t, so the recorder can capture frames in any order at any rate.
+      const BAR_COUNT = 7;
+      const bars = document.getElementById("rec-bars");
+
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const bar = document.createElement("div");
+        bar.className = "rec-bar";
+        bars.append(bar);
+      }
+
+      const byId = (id) => document.getElementById(id);
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      const ease = (p) => (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2);
+      const between = (t, a, b) => t >= a && t < b;
+
+      function centerOf(element) {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      }
+
+      function layoutMenus() {
+        // Like macOS, the menu shifts left when it would leave the screen.
+        const tray = byId("tray-item").getBoundingClientRect();
+        const menu = byId("menu");
+        const menuLeft = Math.min(tray.left, document.body.clientWidth - menu.offsetWidth - 12);
+        menu.style.left = `${menuLeft}px`;
+
+        // Not enough room on the right, so the submenu opens to the left, as
+        // macOS does near the screen edge.
+        const format = byId("format-item").getBoundingClientRect();
+        const submenu = byId("submenu");
+        submenu.style.left = `${menuLeft - 400 + 6}px`;
+        submenu.style.top = `${format.top - 10}px`;
+      }
+
+      // Cursor path: [time, point] keyframes, eased between neighbors.
+      function cursorAt(t, keyframes) {
+        const index = keyframes.findIndex(([time]) => time > t);
+
+        if (index === -1) {
+          return keyframes[keyframes.length - 1][1];
+        }
+
+        if (index === 0) {
+          return keyframes[0][1];
+        }
+
+        const [t0, from] = keyframes[index - 1];
+        const [t1, to] = keyframes[index];
+        const p = ease(clamp((t - t0) / (t1 - t0), 0, 1));
+        return { x: from.x + (to.x - from.x) * p, y: from.y + (to.y - from.y) * p };
+      }
+
+      function renderFrame(t) {
+        layoutMenus();
+
+        const tray = centerOf(byId("tray-item"));
+        const format = centerOf(byId("format-item"));
+        const wav = centerOf(byId("wav-item"));
+        const rest = { x: 760, y: 470 };
+        const nearTray = { x: tray.x - 150, y: 200 };
+
+        const keyframes = [
+          [0, rest],
+          [0.8, rest],
+          [1.7, tray],
+          [2.4, tray],
+          [3.0, nearTray],
+          [4.0, nearTray],
+          [4.6, tray],
+          [6.9, tray],
+          [7.6, tray],
+          [8.3, format],
+          [8.9, { x: format.x - 180, y: format.y }],
+          [9.5, wav],
+        ];
+        const cursor = cursorAt(t, keyframes);
+        const cursorElement = byId("cursor");
+        cursorElement.style.setProperty("--x", `${cursor.x - 3}px`);
+        cursorElement.style.setProperty("--y", `${cursor.y - 3}px`);
+
+        const pressed = between(t, 1.85, 2.0) || between(t, 4.7, 4.85) || between(t, 6.95, 7.1);
+        cursorElement.style.setProperty("--press", pressed ? 0.88 : 1);
+
+        const recording = between(t, 2.0, 4.8);
+        document.body.classList.toggle("is-recording", recording);
+
+        const menuOpen = between(t, 7.05, 10.4);
+        const submenuOpen = between(t, 8.4, 10.4);
+        byId("menu").classList.toggle("is-open", menuOpen);
+        byId("submenu").classList.toggle("is-open", submenuOpen);
+        byId("tray-item").classList.toggle("is-active", pressed || menuOpen);
+        byId("format-item").classList.toggle("is-hovered", between(t, 8.2, 10.4) && t < 9.3);
+        byId("wav-item").classList.toggle("is-hovered", between(t, 9.3, 10.4));
+
+        byId("caption-idle").classList.toggle("is-visible", between(t, 0.2, 1.9));
+        byId("caption-recording").classList.toggle("is-visible", between(t, 2.1, 4.8));
+        byId("caption-saved").classList.toggle("is-visible", between(t, 4.9, 6.9));
+        byId("caption-menu").classList.toggle("is-visible", between(t, 7.2, 10.4));
+
+        [...bars.children].forEach((bar, i) => {
+          const level = 0.35 + 0.65 * Math.abs(Math.sin(t * 7 + i * 1.3) * Math.cos(t * 3 + i));
+          bar.style.height = `${Math.round(8 + level * 36)}px`;
+        });
+
+        const end = clamp((t - 10.6) / 0.6, 0, 1);
+        document.body.style.setProperty("--end", end);
+      }
+
+      window.renderFrame = renderFrame;
+      renderFrame(0);
+    </script>
+  </body>
+</html>

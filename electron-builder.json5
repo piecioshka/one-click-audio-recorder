@@ -1,0 +1,76 @@
+{
+  appId: "pl.piecioshka.one-click-audio-recorder",
+  productName: "OneClick Audio Recorder",
+  copyright: "Copyright © 2026 Piotr Kowalski <piecioshka@gmail.com>",
+  asar: true,
+  // Releases are created by the CI release job from the uploaded artifacts,
+  // never by electron-builder itself (it would publish from a tag build).
+  publish: null,
+  files: [
+    "!**/*.test.js",
+    "!tmp/**",
+    "!CONTEXT.md",
+    "!CONTRIBUTING.md",
+    "!assets/**",
+    "!scripts/**",
+    "!eslint.config.mjs",
+    "!.husky/**",
+  ],
+  // Locks down the packaged binary. With runAsNode on, any local process
+  // could start it with ELECTRON_RUN_AS_NODE=1 and run its own code with the
+  // app's microphone permission. File protocol privileges stay on: the
+  // hidden recorder window is a file:// page.
+  electronFuses: {
+    runAsNode: false,
+    enableCookieEncryption: true,
+    enableNodeOptionsEnvironmentVariable: false,
+    enableNodeCliInspectArguments: false,
+    enableEmbeddedAsarIntegrityValidation: true,
+    onlyLoadAppFromAsar: true,
+    // Flipping fuses breaks the ad-hoc macOS signature; re-sign it.
+    resetAdHocDarwinSignature: true,
+  },
+  directories: {
+    output: "dist",
+    buildResources: "icons",
+  },
+  extraResources: [
+    {
+      from: "icons/tray-icon.png",
+      to: "icons/tray-icon.png",
+    },
+    {
+      from: "icons/tray-icon-recording.png",
+      to: "icons/tray-icon-recording.png",
+    },
+  ],
+  mac: {
+    target: ["dmg", "zip"],
+    icon: "./icons/app-icon.icns",
+    hardenedRuntime: true,
+    entitlements: "build/entitlements.mac.plist",
+    entitlementsInherit: "build/entitlements.mac.plist",
+    extendInfo: {
+      NSMicrophoneUsageDescription: "OneClick Audio Recorder needs microphone access to record audio.",
+      NSCameraUseContinuityCameraDeviceType: true,
+    },
+  },
+  linux: {
+    target: ["AppImage", "deb", "tar.gz"],
+    icon: "./icons/app-icon.png",
+    category: "Utility",
+  },
+  win: {
+    target: [
+      {
+        target: "nsis",
+        arch: ["x64"],
+      },
+      {
+        target: "portable",
+        arch: ["x64"],
+      },
+    ],
+    icon: "./icons/app-icon.ico",
+  },
+}

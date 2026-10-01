@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OneClick Audio Recorder social preview</title>
+    <link rel="stylesheet" href="./marketing.css" />
+    <style>
+      /* GitHub social preview size (1280x640). */
+      body {
+        width: 1280px;
+        height: 640px;
+        display: flex;
+        align-items: center;
+        gap: 72px;
+        padding: 0 88px;
+        background:
+          radial-gradient(circle at 12% 100%, rgba(225, 32, 32, 0.3), transparent 45%),
+          radial-gradient(circle at 95% 0%, rgba(90, 120, 200, 0.35), transparent 50%),
+          linear-gradient(160deg, #1b2740, var(--navy-deep));
+      }
+
+      .icon {
+        width: 340px;
+        height: 340px;
+        flex: none;
+        filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.45));
+      }
+
+      .title {
+        font-size: 68px;
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -1px;
+      }
+
+      .tagline {
+        margin-top: 22px;
+        font-size: 36px;
+        color: var(--muted);
+      }
+
+      .strip {
+        margin-top: 40px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        font-size: 26px;
+        color: var(--muted);
+      }
+
+      .state {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        background: rgba(10, 14, 24, 0.6);
+        color: var(--ink);
+      }
+
+      .dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--dot-idle);
+      }
+
+      .dot.is-recording {
+        background: var(--red);
+      }
+
+      .chips {
+        margin-top: 30px;
+        display: flex;
+        gap: 14px;
+      }
+
+      .chip {
+        padding: 8px 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(246, 248, 252, 0.25);
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <img class="icon" src="../../icons/app-icon.png" alt="" />
+    <div>
+      <div class="title">OneClick<br />Audio Recorder</div>
+      <div class="tagline">Capture every thought in one click.</div>
+      <div class="strip">
+        <span class="state"><span class="dot"></span>idle</span>
+        click
+        <span class="state"><span class="dot is-recording"></span>recording</span>
+      </div>
+      <div class="chips">
+        <span class="chip">macOS · Windows · Linux</span>
+        <span class="chip">WAV · MP3</span>
+      </div>
+    </div>
+  </body>
+</html>
