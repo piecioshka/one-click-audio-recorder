@@ -112,7 +112,9 @@ The tray icons (`tray-icon.png`, `tray-icon-recording.png`, 16x16) are separate 
 
 ## CI
 
-GitHub Actions workflow `.github/workflows/build-all-platforms.yml` checks formatting, lints, runs the tests and builds artifacts on native runners:
+GitHub Actions workflow `.github/workflows/ci.yml` checks formatting, lints and runs the tests on every push and pull request.
+
+`.github/workflows/release.yml` builds the installers on native runners (also on demand from the Actions tab):
 
 - `macos-latest` -> `npm run build:mac`
 - `ubuntu-latest` -> `npm run build:linux`
@@ -125,7 +127,7 @@ npm version patch
 git push --follow-tags
 ```
 
-`npm version` bumps `package.json` and creates the `vX.Y.Z` tag. A pushed tag runs the same builds, then the `release` job checks that the tag matches the `package.json` version and publishes the installers from all three platforms as a GitHub release.
+`npm version` bumps `package.json` and creates the `vX.Y.Z` tag. A pushed tag runs the release workflow: the `release` job checks that the tag matches the `package.json` version and publishes the installers from all three platforms as a GitHub release.
 
 ## Formatting and Linting
 

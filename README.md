@@ -8,7 +8,8 @@
 
 <!-- prettier-ignore-start -->
 
-[![build-all-platforms](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/build-all-platforms.yml/badge.svg)](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/build-all-platforms.yml)
+[![github-ci](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/ci.yml/badge.svg)](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/ci.yml)
+[![release](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/release.yml/badge.svg)](https://github.com/piecioshka/one-click-audio-recorder/actions/workflows/release.yml)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](#requirements)
 [![Electron](https://img.shields.io/badge/Electron-44-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![ffmpeg](https://img.shields.io/badge/ffmpeg-static-007808?logo=ffmpeg&logoColor=white)](https://www.npmjs.com/package/ffmpeg-static)
