@@ -83,7 +83,8 @@ macOS remembers the choice, so later launches start normally.
    - pick the microphone,
    - switch between WAV and MP3,
    - choose the output folder,
-   - open the recordings folder.
+   - open the recordings folder,
+   - show the About panel or quit the app.
 
 ## Default Settings
 

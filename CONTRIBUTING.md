@@ -14,6 +14,7 @@ Notes for working on OneClick Audio Recorder from source. The domain language (r
 | Path                                   | What it does                                                                  |
 | -------------------------------------- | ----------------------------------------------------------------------------- |
 | `index.js`                             | Electron entry point: hides the app from the Dock and starts the tray.        |
+| `src/config.js`                        | App name, debug flag and tray icon paths (packaged and from source).          |
 | `src/features/tray.feature.js`         | Tray icon, clicks, context menu and error dialogs.                            |
 | `src/features/tray-menu.js`            | Builds the context menu template from state (no Electron calls, unit tested). |
 | `src/features/settings-store.js`       | Persists microphone, output format and output folder in `settings.json`.      |
@@ -49,6 +50,8 @@ The `avfoundation` backend (macOS only, `RECORDER_BACKEND=avfoundation`) lets `f
 npm install
 npm start
 ```
+
+`npm run dev` starts the app with nodemon and restarts it whenever `index.js` or a `.js`/`.html` file in `src/` changes.
 
 Environment variables for development:
 
@@ -91,13 +94,21 @@ npm run build:all
 npm run icons:generate
 ```
 
-Generated assets in `icons/`:
+The script reads `icons/app-icon.png` (1024x1024, also used as the Linux icon) and writes:
 
-- `app-icon.png` (Linux / generic)
-- `app-icon.ico` (Windows)
-- `app-icon.icns` (macOS, generated on macOS)
+- `app-icon.ico` (Windows),
+- `app-icon.icns` (macOS).
 
-Primary source icon is `icons/app-icon.png`.
+Both are resized with `sips` and `iconutil`, so they are generated on macOS only and committed. On Linux and Windows the script keeps the committed `app-icon.ico` and skips `app-icon.icns`.
+
+`icons/app-icon-source.svg` is the vector original of the app icon. After editing it, export it to `app-icon.png` and regenerate the icons:
+
+```bash
+rsvg-convert -w 1024 -h 1024 icons/app-icon-source.svg -o icons/app-icon.png
+npm run icons:generate
+```
+
+The tray icons (`tray-icon.png`, `tray-icon-recording.png`, 16x16) are separate files, not produced by this script.
 
 ## CI
 
